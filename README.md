@@ -21,7 +21,7 @@ Every course you add gets its own rail, its own target, and its own math. The Al
 
 ## Reading a syllabus
 
-Open Components, press Read a syllabus, and drop in the PDF. It goes to Claude as a document, along with an instruction to find the grading breakdown and return it as structured data, and comes back as a list of components with weights. If the syllabus states a grading scale, the A cutoff becomes the course target, so a program that puts an A at 93 rather than 90 is respected without you setting it.
+The dropzone sits directly under the course chips at the top of the page. Drop the PDF on it, or click it to choose a file. It goes to Claude as a document, along with an instruction to find the grading breakdown and return it as structured data, and comes back as a list of components with weights. If the syllabus states a grading scale, the A cutoff becomes the course target, so a program that puts an A at 93 rather than 90 is respected without you setting it.
 
 Nothing is applied behind your back. The result appears as a preview with the course name, the component count, the weight total, and the detected A cutoff, and you decide whether it becomes a new course, replaces the one you are looking at, or gets discarded. Points-based syllabi are converted to percents on the way through.
 
