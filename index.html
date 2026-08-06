@@ -273,11 +273,10 @@ canvas{display:block;max-width:100%}
 .btn-go:hover{filter:brightness(1.08)}
 
 /* ---------- syllabus import ---------- */
-.imp{margin-top:14px;border-top:1px solid var(--rule);padding-top:14px}
-.imp[hidden]{display:none}
+.imp{margin-bottom:14px}
 .drop{
-  border:1.5px dashed var(--rule);border-radius:12px;padding:20px 14px;text-align:center;
-  background:var(--panel2);cursor:pointer;width:100%;
+  border:1.5px dashed var(--rule);border-radius:12px;padding:14px;text-align:center;
+  background:var(--panel);cursor:pointer;width:100%;
 }
 .drop:hover,.drop.over{border-color:var(--gold);background:#2C3157}
 .drop-main{font-size:13px;font-weight:500}
@@ -332,6 +331,16 @@ canvas{display:block;max-width:100%}
 <main class="wrap">
 
   <nav class="courses" id="courses" aria-label="Courses"></nav>
+
+  <div class="imp" id="imp">
+    <div class="drop" id="drop" role="button" tabindex="0" aria-label="Upload a syllabus to fill in the grading table">
+      <div class="drop-main">Drop a syllabus here or <u>choose a file</u> and Claude will fill in the grading table</div>
+      <div class="drop-sub">PDF, plain text, or a photo of the grading table. Needs an API key, set under the gear.</div>
+    </div>
+    <input type="file" id="file" class="hidden" accept=".pdf,.txt,.md,.markdown,.png,.jpg,.jpeg,.webp,.gif,application/pdf,text/plain,image/*">
+    <div id="imp-note"></div>
+    <div id="imp-prev"></div>
+  </div>
 
   <section class="card" id="stand-card">
     <div class="chead">
@@ -392,20 +401,9 @@ canvas{display:block;max-width:100%}
       <div id="rows"></div>
       <div class="tfoot">
         <button class="btn" id="add-item">Add item</button>
-        <button class="btn" id="imp-toggle">Read a syllabus</button>
         <span class="wsum" id="wsum"></span>
       </div>
       <div id="wfix"></div>
-
-      <div class="imp" id="imp" hidden>
-        <div class="drop" id="drop" role="button" tabindex="0" aria-label="Upload a syllabus file">
-          <div class="drop-main">Drop a syllabus here or <u>choose a file</u></div>
-          <div class="drop-sub">PDF, plain text, or a photo of the grading table. Up to 25 MB.</div>
-        </div>
-        <input type="file" id="file" class="hidden" accept=".pdf,.txt,.md,.markdown,.png,.jpg,.jpeg,.webp,.gif,application/pdf,text/plain,image/*">
-        <div id="imp-note"></div>
-        <div id="imp-prev"></div>
-      </div>
       <p class="need-note" style="margin-top:12px;font-size:12px">Score accepts a percent or raw points. Type <b>88</b>, <b>88%</b>, or <b>45/50</b>. Leave it blank until the work is graded.</p>
     </section>
 
@@ -1647,16 +1645,14 @@ function init(){
     });
   };
 
-  el("imp-toggle").onclick = function(){
-    var box = el("imp");
-    box.hidden = !box.hidden;
-    this.textContent = box.hidden ? "Read a syllabus" : "Hide the reader";
-    if(!box.hidden && !getKey()){
-      note("Reading a syllabus needs an Anthropic API key. Add one under the gear at the top.", "");
+  el("drop").onclick = function(){
+    if(!getKey()){
+      note("Reading a syllabus needs an Anthropic API key. Add one here, then drop the file again.", "");
+      openSettings();
+      return;
     }
+    el("file").click();
   };
-
-  el("drop").onclick = function(){ el("file").click(); };
   el("drop").onkeydown = function(e){
     if(e.key === "Enter" || e.key === " "){ e.preventDefault(); el("file").click(); }
   };
