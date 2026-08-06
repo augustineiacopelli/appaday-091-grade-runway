@@ -53,14 +53,14 @@ button{cursor:pointer;background:none;border:none}
 .bar-num{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.14em;color:var(--gold)}
 .bar-name{font-family:var(--disp);font-size:15px;font-weight:800;letter-spacing:-.01em}
 .bar-home{
-  margin-left:auto;font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+  font-size:11px;letter-spacing:.1em;text-transform:uppercase;
   color:var(--muted);text-decoration:none;border-bottom:1px solid var(--rule);padding-bottom:2px;
 }
 .bar-home:hover{color:var(--gold);border-color:var(--gold)}
 
 .wrap{width:100%;max-width:1080px;margin:0 auto;padding:16px 16px 40px;flex:1}
 
-/* ---------- course chips ----------- */
+/* ---------- course chips ---------- */
 .courses{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;margin-bottom:16px;scrollbar-width:thin}
 .chip{
   flex:0 0 auto;padding:8px 14px;border:1px solid var(--rule);border-radius:999px;
@@ -174,9 +174,10 @@ button{cursor:pointer;background:none;border:none}
 .remain-need{font-family:var(--mono);font-weight:700;flex:0 0 auto}
 
 /* ---------- projection ---------- */
-.proj-row{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px;align-items:end}
-.proj-slider{grid-column:1/-1}
+.proj-row{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px;align-items:end;margin-top:16px}
+.proj-slider{width:100%}
 input[type=range]{width:100%;accent-color:var(--gold);height:26px}
+input[type=range]:disabled{opacity:.4}
 .proj-out{
   font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);
 }
@@ -240,6 +241,69 @@ canvas{display:block;max-width:100%}
 .ovbar{grid-column:1/-1;height:8px;border-radius:5px;background:var(--panel2);display:flex;overflow:hidden;position:relative}
 .ovneed{grid-column:1/-1;font-size:11px;color:var(--muted);font-family:var(--mono)}
 
+/* ---------- gear + modal ---------- */
+.gear{
+  margin-left:auto;width:32px;height:32px;border-radius:8px;font-size:16px;line-height:1;
+  color:var(--muted);border:1px solid var(--rule);background:var(--panel);position:relative;
+}
+.gear:hover{color:var(--gold);border-color:var(--gold)}
+.gear.dot::after{
+  content:"";position:absolute;top:-3px;right:-3px;width:8px;height:8px;border-radius:50%;
+  background:var(--gold);border:2px solid var(--ground);
+}
+.overlay{
+  position:fixed;inset:0;background:rgba(10,12,22,.78);z-index:80;
+  display:flex;align-items:center;justify-content:center;padding:18px;
+}
+.overlay[hidden]{display:none}
+.modal{
+  width:100%;max-width:440px;max-height:88dvh;overflow:auto;
+  background:var(--panel);border:1px solid var(--rule);border-radius:16px;padding:20px 18px;
+}
+.modal h2{font-family:var(--disp);font-size:19px;font-weight:800;margin:0 0 6px;letter-spacing:-.02em}
+.modal p{font-size:13px;color:var(--muted);margin:0 0 14px}
+.modal label{display:block;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:14px 0 6px}
+.modal input{
+  width:100%;background:var(--panel2);border:1px solid var(--rule);border-radius:9px;
+  padding:11px 12px;font-family:var(--mono);font-size:13px;
+}
+.modal input:focus{border-color:var(--gold)}
+.modal-acts{display:flex;gap:10px;justify-content:flex-end;margin-top:18px;flex-wrap:wrap}
+.btn-go{background:var(--gold);border-color:var(--gold);color:#201804;font-weight:600}
+.btn-go:hover{filter:brightness(1.08)}
+
+/* ---------- syllabus import ---------- */
+.imp{margin-top:14px;border-top:1px solid var(--rule);padding-top:14px}
+.imp[hidden]{display:none}
+.drop{
+  border:1.5px dashed var(--rule);border-radius:12px;padding:20px 14px;text-align:center;
+  background:var(--panel2);cursor:pointer;width:100%;
+}
+.drop:hover,.drop.over{border-color:var(--gold);background:#2C3157}
+.drop-main{font-size:13px;font-weight:500}
+.drop-main u{color:var(--gold)}
+.drop-sub{font-size:11px;color:var(--muted);margin-top:5px}
+.hidden{display:none}
+.imp-note{
+  margin-top:10px;font-size:12px;border-radius:9px;padding:10px 12px;
+  background:rgba(122,133,201,.12);border:1px solid var(--rule);color:var(--muted);
+}
+.imp-note.bad{background:rgba(231,111,140,.1);border-color:rgba(231,111,140,.4);color:var(--rose)}
+.imp-note.good{background:rgba(95,211,172,.1);border-color:rgba(95,211,172,.35);color:var(--mint)}
+.prev{margin-top:12px;border:1px solid var(--rule);border-radius:11px;padding:12px;background:var(--panel2)}
+.prev h3{font-family:var(--disp);font-size:15px;font-weight:800;margin:0 0 2px;letter-spacing:-.01em}
+.prev .psub{font-size:11px;color:var(--muted);margin:0 0 10px;font-family:var(--mono)}
+.prow{display:flex;justify-content:space-between;gap:10px;font-size:13px;padding:4px 0;border-bottom:1px dotted var(--rule)}
+.prow:last-of-type{border-bottom:none}
+.prow span{font-family:var(--mono);font-weight:700;color:var(--mint);flex:0 0 auto}
+.prev-acts{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+
+/* ---------- projection ---------- */
+.proj-lead{font-size:13px;color:var(--muted);margin:0 0 14px}
+.proj-ticks{display:flex;justify-content:space-between;gap:10px;font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:-2px}
+.proj-delta{font-size:13px;color:var(--muted);margin:14px 0 0}
+.proj-delta b{font-weight:600}
+
 .foot{text-align:center;font-size:11px;color:var(--muted);padding:22px 16px 30px;line-height:1.8}
 .foot a{color:var(--muted)}
 .foot a:hover{color:var(--gold)}
@@ -261,6 +325,7 @@ canvas{display:block;max-width:100%}
 <header class="bar">
   <span class="bar-num">091</span>
   <span class="bar-name">Grade Runway</span>
+  <button class="gear" id="gear" type="button" title="Settings" aria-label="Settings">&#9881;</button>
   <a class="bar-home" href="https://augustineiacopelli.github.io/appaday/">AppADay</a>
 </header>
 
@@ -308,17 +373,16 @@ canvas{display:block;max-width:100%}
 
   <section class="card">
     <p class="eyebrow">Projection</p>
-    <div class="proj-row">
-      <div class="proj-slider">
-        <input type="range" id="proj" min="0" max="100" step="1" value="90" aria-label="Average on remaining work">
-      </div>
-      <div class="proj-out">
-        Average <b id="proj-in">90%</b>
-      </div>
-      <div class="proj-out">
-        Final grade <b id="proj-out">--</b>
-      </div>
+    <p class="proj-lead" id="proj-lead">Drag the slider to the average you think you can hold on the work that is still ungraded, and watch where the course finishes.</p>
+    <div class="proj-slider">
+      <input type="range" id="proj" min="0" max="100" step="1" value="90" aria-label="Average score on the remaining ungraded work">
+      <div class="proj-ticks"><span id="tick-lo"></span><span id="tick-hi"></span></div>
     </div>
+    <div class="proj-row">
+      <div class="proj-out">If I average<b id="proj-in">90%</b></div>
+      <div class="proj-out">the course ends at<b id="proj-out">--</b></div>
+    </div>
+    <p class="proj-delta" id="proj-delta"></p>
   </section>
 
   <div class="grid2">
@@ -328,9 +392,20 @@ canvas{display:block;max-width:100%}
       <div id="rows"></div>
       <div class="tfoot">
         <button class="btn" id="add-item">Add item</button>
+        <button class="btn" id="imp-toggle">Read a syllabus</button>
         <span class="wsum" id="wsum"></span>
       </div>
       <div id="wfix"></div>
+
+      <div class="imp" id="imp" hidden>
+        <div class="drop" id="drop" role="button" tabindex="0" aria-label="Upload a syllabus file">
+          <div class="drop-main">Drop a syllabus here or <u>choose a file</u></div>
+          <div class="drop-sub">PDF, plain text, or a photo of the grading table. Up to 25 MB.</div>
+        </div>
+        <input type="file" id="file" class="hidden" accept=".pdf,.txt,.md,.markdown,.png,.jpg,.jpeg,.webp,.gif,application/pdf,text/plain,image/*">
+        <div id="imp-note"></div>
+        <div id="imp-prev"></div>
+      </div>
       <p class="need-note" style="margin-top:12px;font-size:12px">Score accepts a percent or raw points. Type <b>88</b>, <b>88%</b>, or <b>45/50</b>. Leave it blank until the work is graded.</p>
     </section>
 
@@ -352,6 +427,22 @@ canvas{display:block;max-width:100%}
 
 </main>
 
+<div class="overlay" id="overlay" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="set-title">
+    <h2 id="set-title">Settings</h2>
+    <p>Reading a syllabus calls the Anthropic API from this page with your own key. Everything else in Grade Runway works without one.</p>
+    <label for="key">Anthropic API key</label>
+    <input id="key" type="password" autocomplete="off" spellcheck="false" placeholder="sk-ant-...">
+    <p style="margin:8px 0 0;font-size:12px">Stored in this browser only. Never sent anywhere but api.anthropic.com.</p>
+    <div id="testresult"></div>
+    <div class="modal-acts">
+      <button class="btn" id="set-test" type="button">Test key</button>
+      <button class="btn" id="set-cancel" type="button">Cancel</button>
+      <button class="btn btn-go" id="set-save" type="button">Save</button>
+    </div>
+  </div>
+</div>
+
 <footer class="foot">
   Everything stays in this browser. Nothing is uploaded.<br>
   App 091 of <a href="https://augustineiacopelli.github.io/appaday/">AppADay</a> by Augustine Iacopelli
@@ -362,11 +453,19 @@ canvas{display:block;max-width:100%}
 "use strict";
 
 var KEY = "appaday-091-grade-runway";
+var K_KEY = "appaday091-key";
+var API_URL = "https://api.anthropic.com/v1/messages";
+var CLAUDE_MODEL = "claude-sonnet-5";
+var MAX_FILE_BYTES = 25 * 1024 * 1024;
+var IMAGE_TYPES = { png:"image/png", jpg:"image/jpeg", jpeg:"image/jpeg", webp:"image/webp", gif:"image/gif" };
+var TEXT_EXTS = { txt:1, md:1, markdown:1, text:1, rtf:1, csv:1 };
 var LADDER = [[93,"A"],[90,"A-"],[87,"B+"],[83,"B"],[80,"B-"]];
 
 var state = null;
 var confirmDel = 0;
 var confirmReset = 0;
+var projTouched = false;
+var pending = null;
 
 /* ---------------- storage ---------------- */
 function save(){
@@ -524,6 +623,7 @@ function renderCourses(){
       b.onclick = function(){
         state.active = c.id;
         confirmDel = 0;
+        projTouched = false;
         save();
         renderAll();
       };
@@ -547,6 +647,7 @@ function addCourse(){
   state.courses.push(c);
   state.active = c.id;
   confirmDel = 0;
+  projTouched = false;
   save();
   renderAll();
   var n = el("cname");
@@ -743,16 +844,65 @@ function renderNeed(a){
 /* ---------------- render: projection ---------------- */
 function renderProj(a){
   var slider = el("proj");
-  var v = num(slider.value, 90);
-  el("proj-in").textContent = v + "%";
-  var out = el("proj-out");
+  var lead = el("proj-lead"), lo = el("tick-lo"), hi = el("tick-hi");
+  var inOut = el("proj-in"), out = el("proj-out"), delta = el("proj-delta");
+
   if(a.totalW <= 0){
-    out.textContent = "--";
+    slider.disabled = true;
+    lead.textContent = "Add a weighted component first and this will show you where the course can finish.";
+    lo.textContent = ""; hi.textContent = "";
+    inOut.textContent = "--"; out.textContent = "--"; delta.textContent = "";
     return;
   }
+
+  if(a.remW <= 0){
+    slider.disabled = true;
+    lead.textContent = "Every point in this course is graded, so there is nothing left to project.";
+    lo.textContent = ""; hi.textContent = "";
+    inOut.textContent = "--";
+    out.textContent = fmt(a.floor) + "% " + letterFor(a.floor);
+    out.style.color = a.floor >= a.target ? "var(--mint)" : "var(--chalk)";
+    delta.textContent = "";
+    return;
+  }
+
+  slider.disabled = false;
+  lead.textContent = "The remaining " + fmt(a.remW / a.totalW * 100) +
+    "% of this course is still ungraded. Drag the slider to the average you think you can hold on that work, and the course grade below moves with it.";
+
+  /* the slider tracks what you actually need until you grab it */
+  if(!projTouched){
+    var snap = a.needed;
+    if(snap === null || snap < 0) snap = 0;
+    if(snap > 100) snap = 100;
+    slider.value = Math.round(snap);
+  }
+
+  var v = num(slider.value, 90);
+  inOut.textContent = v + "%";
   var f = project(a, v);
   out.textContent = fmt(f) + "% " + letterFor(f);
   out.style.color = f >= a.target ? "var(--mint)" : "var(--chalk)";
+
+  lo.textContent = "score 0% on it all " + "\u2192 " + fmt(a.floor) + "%";
+  hi.textContent = "ace it all \u2192 " + fmt(a.ceil) + "%";
+
+  var gap = f - a.target;
+  clear(delta);
+  var b = document.createElement("b");
+  if(Math.abs(gap) < 0.05){
+    b.textContent = "lands exactly on";
+    b.style.color = "var(--mint)";
+  }else if(gap > 0){
+    b.textContent = fmt(gap) + " points above";
+    b.style.color = "var(--mint)";
+  }else{
+    b.textContent = fmt(-gap) + " points short of";
+    b.style.color = "var(--rose)";
+  }
+  delta.appendChild(document.createTextNode("That lands "));
+  delta.appendChild(b);
+  delta.appendChild(document.createTextNode(" your " + fmt(a.target) + "% target."));
 }
 
 /* ---------------- render: rows ---------------- */
@@ -1056,6 +1206,7 @@ function renderOverview(){
       row.onclick = function(){
         state.active = c.id;
         confirmDel = 0;
+        projTouched = false;
         save();
         renderAll();
         window.scrollTo({ top:0, behavior:"smooth" });
@@ -1081,6 +1232,271 @@ function renderDerived(){
 function renderAll(){
   renderRows();
   renderDerived();
+}
+
+/* ---------------- settings ---------------- */
+function getKey(){
+  try{ return (localStorage.getItem(K_KEY) || "").trim(); }catch(e){ return ""; }
+}
+function setKey(v){
+  try{ localStorage.setItem(K_KEY, v); }catch(e){}
+}
+function markGear(){
+  var g = el("gear");
+  g.className = getKey() ? "gear" : "gear dot";
+}
+function openSettings(){
+  el("key").value = getKey();
+  clear(el("testresult"));
+  el("overlay").hidden = false;
+  window.setTimeout(function(){ el("key").focus(); }, 40);
+}
+function closeSettings(){ el("overlay").hidden = true; }
+
+/* ---------------- import: notices ---------------- */
+function note(msg, kind){
+  var box = el("imp-note");
+  clear(box);
+  if(!msg) return;
+  var d = document.createElement("div");
+  d.className = "imp-note" + (kind ? " " + kind : "");
+  d.textContent = msg;
+  box.appendChild(d);
+}
+
+/* ---------------- import: file reading ---------------- */
+function extOf(name){
+  var i = String(name).lastIndexOf(".");
+  return i < 0 ? "" : String(name).slice(i + 1).toLowerCase();
+}
+function readB64(file){
+  return new Promise(function(resolve, reject){
+    var r = new FileReader();
+    r.onload = function(){
+      var s = String(r.result), k = s.indexOf(",");
+      resolve(k === -1 ? s : s.slice(k + 1));
+    };
+    r.onerror = function(){ reject(new Error("That file could not be read.")); };
+    r.readAsDataURL(file);
+  });
+}
+function readText(file){
+  return new Promise(function(resolve, reject){
+    var r = new FileReader();
+    r.onload = function(){ resolve(String(r.result)); };
+    r.onerror = function(){ reject(new Error("That file could not be read.")); };
+    r.readAsText(file);
+  });
+}
+
+function acceptFile(file){
+  if(!file) return;
+  if(!getKey()){
+    note("Add your Anthropic API key in Settings first.", "bad");
+    openSettings();
+    return;
+  }
+  if(file.size > MAX_FILE_BYTES){
+    note("That file is larger than 25 MB. Export a smaller PDF or paste the grading table into a text file.", "bad");
+    return;
+  }
+  var ext = extOf(file.name);
+  var isPdf = (ext === "pdf" || file.type === "application/pdf");
+  var img = IMAGE_TYPES[ext] || (/^image\//.test(file.type || "") ? file.type : null);
+
+  if(isPdf){
+    readB64(file).then(function(b64){
+      askClaude([{ type:"document", source:{ type:"base64", media_type:"application/pdf", data:b64 } }], file.name);
+    })["catch"](function(e){ note(e.message, "bad"); });
+    return;
+  }
+  if(TEXT_EXTS[ext] || /^text\//.test(file.type || "")){
+    readText(file).then(function(t){
+      askClaude([{ type:"text", text:"Syllabus text follows.\n\n" + t.slice(0, 60000) }], file.name);
+    })["catch"](function(e){ note(e.message, "bad"); });
+    return;
+  }
+  if(img){
+    readB64(file).then(function(b64){
+      askClaude([{ type:"image", source:{ type:"base64", media_type:img, data:b64 } }], file.name);
+    })["catch"](function(e){ note(e.message, "bad"); });
+    return;
+  }
+  note("That file type is not supported. Use a PDF, a plain text file, or a photo of the grading table.", "bad");
+}
+
+/* ---------------- import: the API call ---------------- */
+function promptText(){
+  return "You are reading a college course syllabus. Find the grading breakdown, the table or list " +
+    "that says how the final grade is weighted.\n\n" +
+    "Reply with JSON and nothing else. No prose, no markdown fences.\n\n" +
+    "Shape:\n" +
+    '{"course":"MSBA 601 Data Foundations","target":93,"items":[{"name":"Homework","weight":25}]}\n\n' +
+    "Rules:\n" +
+    "1. course is the course number and title, 60 characters or less. Use an empty string if you cannot find it.\n" +
+    "2. items lists every graded component. name is a short label, 40 characters or less.\n" +
+    "3. weight is that component's share of the final grade as a plain number of percent. If the syllabus " +
+    "gives raw points instead of percents, convert each to its percent of the total points and round to one decimal.\n" +
+    "4. Combine repeated items of the same kind into one line when the syllabus does, and keep them separate when it does.\n" +
+    "5. target is the lowest percent that earns a straight A on the syllabus grading scale. If the scale is not " +
+    "stated, use 90.\n" +
+    "6. If there is no grading breakdown anywhere in the document, reply with " +
+    '{"error":"one short sentence saying what you saw instead"}';
+}
+
+function askClaude(blocks, label){
+  note("Reading " + label + " with Claude. This usually takes a few seconds.", "");
+  var drop = el("drop");
+  drop.style.opacity = ".5";
+  clear(el("imp-prev"));
+
+  var content = blocks.slice();
+  content.push({ type:"text", text:promptText() });
+
+  fetch(API_URL, {
+    method:"POST",
+    headers:{
+      "Content-Type":"application/json",
+      "x-api-key":getKey(),
+      "anthropic-version":"2023-06-01",
+      "anthropic-dangerous-direct-browser-access":"true"
+    },
+    body:JSON.stringify({
+      model:CLAUDE_MODEL,
+      max_tokens:2000,
+      messages:[{ role:"user", content:content }]
+    })
+  }).then(function(r){
+    return r.json().then(function(j){ return { ok:r.ok, body:j }; });
+  }).then(function(res){
+    drop.style.opacity = "";
+    if(!res.ok){
+      var m = res.body && res.body.error && res.body.error.message ? res.body.error.message : "The request failed.";
+      note("Claude could not read that. " + m, "bad");
+      return;
+    }
+    var txt = "";
+    var arr = res.body.content || [];
+    var i;
+    for(i = 0; i < arr.length; i++){
+      if(arr[i].type === "text") txt += arr[i].text;
+    }
+    var cleanTxt = txt.replace(/```json/g, "").replace(/```/g, "").trim();
+    var data = null;
+    try{ data = JSON.parse(cleanTxt); }catch(e){ data = null; }
+    if(!data){
+      note("Claude replied with something this app could not parse. Try a clearer scan, or add the components by hand.", "bad");
+      return;
+    }
+    if(data.error){
+      note(String(data.error), "bad");
+      return;
+    }
+    var items = [];
+    var raw = data.items || [];
+    for(i = 0; i < raw.length; i++){
+      var w = parseFloat(raw[i].weight);
+      var nm = String(raw[i].name || "").slice(0, 40);
+      if(nm && isFinite(w) && w > 0) items.push({ name:nm, weight:round1(w) });
+    }
+    if(!items.length){
+      note("No weighted components came back from that document. Try a page that has the grading table on it.", "bad");
+      return;
+    }
+    var tg = parseFloat(data.target);
+    if(!isFinite(tg) || tg < 50 || tg > 100) tg = 90;
+    pending = { name:String(data.course || "").slice(0, 60) || "Imported course", target:tg, items:items };
+    note("", "");
+    renderPreview();
+  })["catch"](function(e){
+    drop.style.opacity = "";
+    note("The request did not go through. " + (e && e.message ? e.message : "Check your key and your connection."), "bad");
+  });
+}
+
+/* ---------------- import: preview and apply ---------------- */
+function renderPreview(){
+  var box = el("imp-prev");
+  clear(box);
+  if(!pending) return;
+
+  var wrap = document.createElement("div");
+  wrap.className = "prev";
+
+  var h = document.createElement("h3");
+  h.textContent = pending.name;
+  wrap.appendChild(h);
+
+  var sum = 0, i;
+  for(i = 0; i < pending.items.length; i++) sum += pending.items[i].weight;
+
+  var sub = document.createElement("p");
+  sub.className = "psub";
+  sub.textContent = pending.items.length + " components  \u00b7  " + fmt(sum) + "% total  \u00b7  A at " + fmt(pending.target) + "%";
+  wrap.appendChild(sub);
+
+  for(i = 0; i < pending.items.length; i++){
+    var r = document.createElement("div");
+    r.className = "prow";
+    var nm = document.createElement("div");
+    nm.textContent = pending.items[i].name;
+    r.appendChild(nm);
+    var vv = document.createElement("span");
+    vv.textContent = fmt(pending.items[i].weight) + "%";
+    r.appendChild(vv);
+    wrap.appendChild(r);
+  }
+
+  var acts = document.createElement("div");
+  acts.className = "prev-acts";
+
+  var b1 = document.createElement("button");
+  b1.type = "button";
+  b1.className = "btn btn-go";
+  b1.textContent = "Add as a new course";
+  b1.onclick = function(){ applyPending(true); };
+  acts.appendChild(b1);
+
+  var b2 = document.createElement("button");
+  b2.type = "button";
+  b2.className = "btn";
+  b2.textContent = "Replace this course";
+  b2.onclick = function(){ applyPending(false); };
+  acts.appendChild(b2);
+
+  var b3 = document.createElement("button");
+  b3.type = "button";
+  b3.className = "btn";
+  b3.textContent = "Discard";
+  b3.onclick = function(){ pending = null; clear(el("imp-prev")); };
+  acts.appendChild(b3);
+
+  wrap.appendChild(acts);
+  box.appendChild(wrap);
+}
+
+function applyPending(asNew){
+  if(!pending) return;
+  var items = [], i;
+  for(i = 0; i < pending.items.length; i++){
+    items.push({ id:uid(), name:pending.items[i].name, weight:pending.items[i].weight, raw:"" });
+  }
+  if(asNew){
+    var c = { id:uid(), name:pending.name, target:pending.target, items:items };
+    state.courses.push(c);
+    state.active = c.id;
+  }else{
+    var cur = active();
+    cur.name = pending.name;
+    cur.target = pending.target;
+    cur.items = items;
+  }
+  pending = null;
+  projTouched = false;
+  save();
+  clear(el("imp-prev"));
+  note("Loaded. Fill in scores as work comes back graded.", "good");
+  renderAll();
 }
 
 /* ---------------- wiring ---------------- */
@@ -1117,7 +1533,10 @@ function init(){
       if(last){ last.focus(); last.select(); }
     }
   };
-  el("proj").oninput = function(){ renderProj(analyze(active())); };
+  el("proj").oninput = function(){
+    projTouched = true;
+    renderProj(analyze(active()));
+  };
 
   el("del-course").onclick = function(){
     var b = this;
@@ -1163,6 +1582,99 @@ function init(){
     save();
     renderAll();
   };
+
+  markGear();
+  el("gear").onclick = openSettings;
+  el("set-cancel").onclick = closeSettings;
+  el("set-save").onclick = function(){
+    setKey(el("key").value.trim());
+    markGear();
+    closeSettings();
+  };
+  el("overlay").onclick = function(e){ if(e.target === this) closeSettings(); };
+  document.addEventListener("keydown", function(e){
+    if(e.key === "Escape" && !el("overlay").hidden) closeSettings();
+  });
+
+  el("set-test").onclick = function(){
+    var btn = this, k = el("key").value.trim(), out = el("testresult");
+    clear(out);
+    if(!k){
+      var w = document.createElement("div");
+      w.className = "imp-note bad";
+      w.textContent = "Paste a key first.";
+      out.appendChild(w);
+      return;
+    }
+    btn.disabled = true;
+    btn.textContent = "Testing";
+    var d = document.createElement("div");
+    d.className = "imp-note";
+    d.textContent = "Sending a one word request to " + CLAUDE_MODEL + ".";
+    out.appendChild(d);
+    fetch(API_URL, {
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json",
+        "x-api-key":k,
+        "anthropic-version":"2023-06-01",
+        "anthropic-dangerous-direct-browser-access":"true"
+      },
+      body:JSON.stringify({ model:CLAUDE_MODEL, max_tokens:16, messages:[{ role:"user", content:"Reply with the single word ready." }] })
+    }).then(function(r){
+      return r.json().then(function(j){ return { ok:r.ok, body:j }; });
+    }).then(function(res){
+      btn.disabled = false;
+      btn.textContent = "Test key";
+      clear(out);
+      var n = document.createElement("div");
+      if(res.ok){
+        n.className = "imp-note good";
+        n.textContent = "The key works.";
+      }else{
+        n.className = "imp-note bad";
+        n.textContent = res.body && res.body.error && res.body.error.message ? res.body.error.message : "That key was rejected.";
+      }
+      out.appendChild(n);
+    })["catch"](function(e){
+      btn.disabled = false;
+      btn.textContent = "Test key";
+      clear(out);
+      var n = document.createElement("div");
+      n.className = "imp-note bad";
+      n.textContent = "Could not reach the API. " + (e && e.message ? e.message : "");
+      out.appendChild(n);
+    });
+  };
+
+  el("imp-toggle").onclick = function(){
+    var box = el("imp");
+    box.hidden = !box.hidden;
+    this.textContent = box.hidden ? "Read a syllabus" : "Hide the reader";
+    if(!box.hidden && !getKey()){
+      note("Reading a syllabus needs an Anthropic API key. Add one under the gear at the top.", "");
+    }
+  };
+
+  el("drop").onclick = function(){ el("file").click(); };
+  el("drop").onkeydown = function(e){
+    if(e.key === "Enter" || e.key === " "){ e.preventDefault(); el("file").click(); }
+  };
+  el("file").onchange = function(e){
+    if(e.target.files && e.target.files.length) acceptFile(e.target.files[0]);
+    e.target.value = "";
+  };
+  ["dragenter","dragover"].forEach(function(ev){
+    el("imp").addEventListener(ev, function(e){ e.preventDefault(); el("drop").classList.add("over"); });
+  });
+  ["dragleave","drop"].forEach(function(ev){
+    el("imp").addEventListener(ev, function(e){ e.preventDefault(); el("drop").classList.remove("over"); });
+  });
+  el("imp").addEventListener("drop", function(e){
+    if(e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length){
+      acceptFile(e.dataTransfer.files[0]);
+    }
+  });
 
   var t = null;
   window.addEventListener("resize", function(){
