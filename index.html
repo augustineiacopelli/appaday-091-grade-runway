@@ -1,0 +1,1189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Grade Runway &middot; AppADay 091</title>
+<meta name="description" content="Track weighted course grades across every class and see the minimum average you still need on the work that is left.">
+<meta name="theme-color" content="#171A2B">
+<meta property="og:title" content="Grade Runway - AppADay 091">
+<meta property="og:description" content="Weighted grades for every course, plus the minimum you need on what is left.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&amp;family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&amp;family=JetBrains+Mono:wght@400;700&amp;display=swap" rel="stylesheet">
+<style>
+:root{
+  --ground:#171A2B;
+  --panel:#1F2340;
+  --panel2:#262B4D;
+  --rule:#363C63;
+  --chalk:#ECEAF4;
+  --muted:#9AA1C8;
+  --mint:#5FD3AC;
+  --rose:#E76F8C;
+  --gold:#F2C15C;
+  --lilac:#7A85C9;
+  --sans:"Archivo",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --disp:"Bricolage Grotesque","Archivo",system-ui,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;min-height:100dvh;display:flex;flex-direction:column;
+  background:var(--ground);color:var(--chalk);
+  font-family:var(--sans);font-size:15px;line-height:1.5;
+  background-image:
+    linear-gradient(rgba(122,133,201,.055) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(122,133,201,.055) 1px,transparent 1px);
+  background-size:26px 26px;
+}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer;background:none;border:none}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px;border-radius:4px}
+
+/* ---------- app header bar ---------- */
+.bar{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  padding:10px 16px;border-bottom:1px solid var(--rule);
+  background:rgba(23,26,43,.92);backdrop-filter:blur(6px);
+  position:sticky;top:0;z-index:40;
+}
+.bar-num{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.14em;color:var(--gold)}
+.bar-name{font-family:var(--disp);font-size:15px;font-weight:800;letter-spacing:-.01em}
+.bar-home{
+  margin-left:auto;font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--muted);text-decoration:none;border-bottom:1px solid var(--rule);padding-bottom:2px;
+}
+.bar-home:hover{color:var(--gold);border-color:var(--gold)}
+
+.wrap{width:100%;max-width:1080px;margin:0 auto;padding:16px 16px 40px;flex:1}
+
+/* ---------- course chips ---------- */
+.courses{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;margin-bottom:16px;scrollbar-width:thin}
+.chip{
+  flex:0 0 auto;padding:8px 14px;border:1px solid var(--rule);border-radius:999px;
+  background:var(--panel);color:var(--muted);font-size:13px;font-weight:500;white-space:nowrap;
+  display:flex;align-items:center;gap:8px;
+}
+.chip:hover{border-color:var(--lilac);color:var(--chalk)}
+.chip.on{background:var(--chalk);border-color:var(--chalk);color:var(--ground);font-weight:600}
+.chip-pct{font-family:var(--mono);font-size:12px;font-weight:700}
+.chip.on .chip-pct{color:var(--ground)}
+.chip-add{border-style:dashed;color:var(--lilac)}
+
+/* ---------- panels ---------- */
+.card{
+  background:var(--panel);border:1px solid var(--rule);border-radius:14px;
+  padding:18px 16px;margin-bottom:14px;
+}
+.eyebrow{
+  font-size:10px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--muted);margin:0 0 12px;
+}
+
+/* ---------- course head ---------- */
+.chead{display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap;margin-bottom:14px}
+.cname{
+  flex:1 1 200px;min-width:0;background:transparent;border:none;border-bottom:1px dashed var(--rule);
+  font-family:var(--disp);font-size:clamp(17px,5vw,23px);font-weight:800;letter-spacing:-.02em;
+  padding:2px 0 6px;color:var(--chalk);
+}
+.cname:hover{border-bottom-color:var(--lilac)}
+.target-box{display:flex;align-items:center;gap:8px;flex:0 0 auto}
+.target-box label{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.target-in{
+  width:64px;background:var(--panel2);border:1px solid var(--rule);border-radius:8px;
+  padding:6px 8px;font-family:var(--mono);font-weight:700;font-size:14px;text-align:center;color:var(--gold);
+}
+
+/* ---------- hero ---------- */
+.hero{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.hero-pct{font-family:var(--mono);font-weight:700;font-size:clamp(46px,15vw,76px);line-height:.9;letter-spacing:-.04em}
+.hero-letter{
+  font-family:var(--disp);font-weight:800;font-size:clamp(20px,6vw,30px);
+  color:var(--gold);letter-spacing:-.02em;
+}
+.hero-sub{width:100%;margin-top:10px;font-size:13px;color:var(--muted)}
+.hero-sub b{color:var(--chalk);font-weight:600}
+
+/* ---------- the rail ---------- */
+.rail{position:relative;margin:28px 0 6px}
+.rail-track{
+  position:relative;display:flex;height:38px;border-radius:8px;overflow:hidden;
+  background:var(--panel2);border:1px solid var(--rule);
+}
+.seg{display:flex;min-width:0;border-right:1px solid var(--ground)}
+.seg:last-child{border-right:none}
+.fill-earn{background:var(--mint)}
+.fill-lost{background:repeating-linear-gradient(135deg,rgba(231,111,140,.55) 0 5px,rgba(231,111,140,.25) 5px 10px)}
+.fill-pend{background:repeating-linear-gradient(135deg,rgba(122,133,201,.42) 0 5px,rgba(122,133,201,.16) 5px 10px)}
+.rail-mark{position:absolute;top:-5px;height:50px;width:2px;z-index:3;pointer-events:none}
+.rail-target{background:var(--gold);box-shadow:0 0 0 1px rgba(23,26,43,.7)}
+.rail-target::after{
+  content:attr(data-lab);position:absolute;top:-16px;left:50%;transform:translateX(-50%);
+  font-family:var(--mono);font-size:10px;font-weight:700;color:var(--gold);white-space:nowrap;
+}
+.rail-labels{display:flex;margin-top:7px;gap:0}
+.rlab{
+  min-width:0;font-size:10px;letter-spacing:.04em;color:var(--muted);
+  padding-right:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.legend{display:flex;flex-wrap:wrap;gap:14px;margin-top:14px;font-size:11px;color:var(--muted)}
+.legend span{display:flex;align-items:center;gap:6px}
+.swatch{width:12px;height:12px;border-radius:3px;flex:0 0 auto}
+.sw-earn{background:var(--mint)}
+.sw-lost{background:repeating-linear-gradient(135deg,rgba(231,111,140,.75) 0 4px,rgba(231,111,140,.3) 4px 8px)}
+.sw-pend{background:repeating-linear-gradient(135deg,rgba(122,133,201,.6) 0 4px,rgba(122,133,201,.2) 4px 8px)}
+.sw-target{background:var(--gold)}
+
+/* ---------- need panel ---------- */
+.need-line{font-size:14px;color:var(--muted);margin:0 0 4px}
+.need-big{
+  font-family:var(--mono);font-weight:700;font-size:clamp(30px,10vw,44px);line-height:1;
+  letter-spacing:-.03em;margin:0 0 6px;
+}
+.need-big.ok{color:var(--mint)}
+.need-big.warn{color:var(--gold)}
+.need-big.bad{color:var(--rose)}
+.need-note{font-size:13px;color:var(--muted);margin:0}
+.need-note b{color:var(--chalk);font-weight:600}
+
+.ladder{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.rung{
+  border:1px solid var(--rule);border-radius:10px;background:var(--panel2);
+  padding:8px 11px;text-align:left;min-width:82px;
+}
+.rung:hover{border-color:var(--lilac)}
+.rung.on{border-color:var(--gold);box-shadow:inset 0 0 0 1px var(--gold)}
+.rung-l{display:block;font-family:var(--disp);font-weight:800;font-size:13px;letter-spacing:-.01em}
+.rung-v{display:block;font-family:var(--mono);font-size:12px;font-weight:700;margin-top:2px}
+.rung-v.ok{color:var(--mint)}
+.rung-v.warn{color:var(--gold)}
+.rung-v.bad{color:var(--rose)}
+
+.remain{margin-top:16px;border-top:1px solid var(--rule);padding-top:12px}
+.remain-row{
+  display:flex;justify-content:space-between;gap:12px;align-items:baseline;
+  padding:6px 0;font-size:13px;border-bottom:1px dotted var(--rule);
+}
+.remain-row:last-child{border-bottom:none}
+.remain-name{color:var(--chalk);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.remain-name span{color:var(--muted);font-family:var(--mono);font-size:11px;margin-left:6px}
+.remain-need{font-family:var(--mono);font-weight:700;flex:0 0 auto}
+
+/* ---------- projection ---------- */
+.proj-row{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px;align-items:end}
+.proj-slider{grid-column:1/-1}
+input[type=range]{width:100%;accent-color:var(--gold);height:26px}
+.proj-out{
+  font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);
+}
+.proj-out b{
+  font-family:var(--mono);font-size:21px;font-weight:700;color:var(--chalk);
+  display:block;letter-spacing:-.02em;margin-top:3px;text-transform:none;
+}
+
+/* ---------- component table ---------- */
+.thead,.trow{display:grid;grid-template-columns:minmax(0,1fr) 54px 68px 30px;gap:6px;align-items:center}
+@media (min-width:430px){
+  .thead,.trow{grid-template-columns:minmax(0,1fr) 68px 84px 34px;gap:8px}
+}
+.thead{
+  font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);
+  padding:0 0 8px;border-bottom:1px solid var(--rule);margin-bottom:6px;
+}
+.thead div:nth-child(2),.thead div:nth-child(3){text-align:center}
+.trow{padding:5px 0}
+.cell{
+  width:100%;background:var(--panel2);border:1px solid var(--rule);border-radius:8px;
+  padding:9px 10px;min-width:0;
+}
+.cell:focus{border-color:var(--gold);background:#2C3157}
+.cell-w,.cell-s{font-family:var(--mono);font-size:13px;text-align:center;padding:9px 2px}
+.cell-s.has{color:var(--mint);font-weight:700}
+.cell-s.bad{color:var(--rose)}
+.kill{
+  width:30px;height:32px;border-radius:8px;color:var(--muted);font-size:17px;line-height:1;
+  border:1px solid transparent;
+}
+.kill:hover{color:var(--rose);border-color:var(--rule);background:var(--panel2)}
+.tfoot{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:12px}
+.btn{
+  border:1px solid var(--rule);border-radius:9px;padding:9px 14px;font-size:13px;font-weight:500;
+  background:var(--panel2);color:var(--chalk);
+}
+.btn:hover{border-color:var(--lilac)}
+.btn-warn:hover{border-color:var(--rose);color:var(--rose)}
+.wsum{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.wsum.off{color:var(--gold)}
+.wfix{
+  margin-top:10px;font-size:12px;color:var(--gold);background:rgba(242,193,92,.09);
+  border:1px solid rgba(242,193,92,.3);border-radius:9px;padding:10px 12px;
+  display:flex;gap:10px;align-items:center;flex-wrap:wrap;
+}
+.wfix button{border:1px solid var(--gold);color:var(--gold);border-radius:7px;padding:5px 10px;font-size:12px}
+
+/* ---------- chart ---------- */
+.chart-hold{width:100%}
+canvas{display:block;max-width:100%}
+
+/* ---------- overview ---------- */
+.ovrow{
+  display:grid;grid-template-columns:1fr auto;gap:6px 12px;align-items:center;
+  padding:11px 0;border-bottom:1px dotted var(--rule);width:100%;text-align:left;
+}
+.ovrow:last-child{border-bottom:none}
+.ovname{font-weight:600;font-size:14px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ovpct{font-family:var(--mono);font-weight:700;font-size:15px;text-align:right}
+.ovbar{grid-column:1/-1;height:8px;border-radius:5px;background:var(--panel2);display:flex;overflow:hidden;position:relative}
+.ovneed{grid-column:1/-1;font-size:11px;color:var(--muted);font-family:var(--mono)}
+
+.foot{text-align:center;font-size:11px;color:var(--muted);padding:22px 16px 30px;line-height:1.8}
+.foot a{color:var(--muted)}
+.foot a:hover{color:var(--gold)}
+.empty{color:var(--muted);font-size:14px;text-align:center;padding:26px 10px}
+
+@media (min-width:820px){
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}
+  .grid2>.card{margin-bottom:0}
+  .wrap{padding-top:22px}
+}
+@media (prefers-reduced-motion:no-preference){
+  .fill-earn,.seg{transition:width .35s ease}
+  .rail-mark{transition:left .35s ease}
+}
+</style>
+</head>
+<body>
+
+<header class="bar">
+  <span class="bar-num">091</span>
+  <span class="bar-name">Grade Runway</span>
+  <a class="bar-home" href="https://augustineiacopelli.github.io/appaday/">AppADay</a>
+</header>
+
+<main class="wrap">
+
+  <nav class="courses" id="courses" aria-label="Courses"></nav>
+
+  <section class="card" id="stand-card">
+    <div class="chead">
+      <input class="cname" id="cname" type="text" aria-label="Course name" placeholder="Course name" maxlength="60">
+      <div class="target-box">
+        <label for="target">Target</label>
+        <input class="target-in" id="target" type="number" min="1" max="100" step="0.5" inputmode="decimal">
+      </div>
+    </div>
+
+    <p class="eyebrow">Where you stand</p>
+    <div class="hero">
+      <span class="hero-pct" id="hero-pct">--</span>
+      <span class="hero-letter" id="hero-letter"></span>
+      <span class="hero-sub" id="hero-sub"></span>
+    </div>
+
+    <div class="rail">
+      <div class="rail-track" id="rail-track"></div>
+      <div class="rail-labels" id="rail-labels"></div>
+    </div>
+
+    <div class="legend">
+      <span><i class="swatch sw-earn"></i>Points earned</span>
+      <span><i class="swatch sw-lost"></i>Points lost</span>
+      <span><i class="swatch sw-pend"></i>Runway left</span>
+      <span><i class="swatch sw-target"></i>Target line</span>
+    </div>
+  </section>
+
+  <section class="card" id="need-card">
+    <p class="eyebrow">What it takes</p>
+    <p class="need-line" id="need-line">To finish at your target you need</p>
+    <p class="need-big" id="need-big">--</p>
+    <p class="need-note" id="need-note"></p>
+    <div class="ladder" id="ladder"></div>
+    <div class="remain" id="remain"></div>
+  </section>
+
+  <section class="card">
+    <p class="eyebrow">Projection</p>
+    <div class="proj-row">
+      <div class="proj-slider">
+        <input type="range" id="proj" min="0" max="100" step="1" value="90" aria-label="Average on remaining work">
+      </div>
+      <div class="proj-out">
+        Average <b id="proj-in">90%</b>
+      </div>
+      <div class="proj-out">
+        Final grade <b id="proj-out">--</b>
+      </div>
+    </div>
+  </section>
+
+  <div class="grid2">
+    <section class="card">
+      <p class="eyebrow">Components</p>
+      <div class="thead"><div>Item</div><div>Weight</div><div>Score</div><div></div></div>
+      <div id="rows"></div>
+      <div class="tfoot">
+        <button class="btn" id="add-item">Add item</button>
+        <span class="wsum" id="wsum"></span>
+      </div>
+      <div id="wfix"></div>
+      <p class="need-note" style="margin-top:12px;font-size:12px">Score accepts a percent or raw points. Type <b>88</b>, <b>88%</b>, or <b>45/50</b>. Leave it blank until the work is graded.</p>
+    </section>
+
+    <section class="card">
+      <p class="eyebrow">Contribution to the final grade</p>
+      <div class="chart-hold"><canvas id="chart"></canvas></div>
+    </section>
+  </div>
+
+  <section class="card" id="ov-card">
+    <p class="eyebrow">All courses</p>
+    <div id="overview"></div>
+  </section>
+
+  <div class="tfoot" style="margin-top:4px">
+    <button class="btn btn-warn" id="del-course">Delete this course</button>
+    <button class="btn btn-warn" id="reset">Start fresh</button>
+  </div>
+
+</main>
+
+<footer class="foot">
+  Everything stays in this browser. Nothing is uploaded.<br>
+  App 091 of <a href="https://augustineiacopelli.github.io/appaday/">AppADay</a> by Augustine Iacopelli
+</footer>
+
+<script>
+(function(){
+"use strict";
+
+var KEY = "appaday-091-grade-runway";
+var LADDER = [[93,"A"],[90,"A-"],[87,"B+"],[83,"B"],[80,"B-"]];
+
+var state = null;
+var confirmDel = 0;
+var confirmReset = 0;
+
+/* ---------------- storage ---------------- */
+function save(){
+  try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){}
+}
+function load(){
+  try{
+    var raw = localStorage.getItem(KEY);
+    if(raw){
+      var p = JSON.parse(raw);
+      if(p && p.courses && p.courses.length) return p;
+    }
+  }catch(e){}
+  return null;
+}
+
+function uid(){ return "id" + Math.random().toString(36).slice(2,9); }
+
+function seed(){
+  return {
+    active: "c1",
+    courses: [
+      { id:"c1", name:"MSBA 601 Data Foundations", target:90, items:[
+        { id:uid(), name:"Homework", weight:25, raw:"92" },
+        { id:uid(), name:"Quizzes", weight:15, raw:"88" },
+        { id:uid(), name:"Midterm Exam", weight:20, raw:"84" },
+        { id:uid(), name:"Team Project", weight:20, raw:"" },
+        { id:uid(), name:"Final Exam", weight:20, raw:"" }
+      ]},
+      { id:"c2", name:"MSBA 615 Applied Statistics", target:90, items:[
+        { id:uid(), name:"Lab Sets", weight:30, raw:"94" },
+        { id:uid(), name:"Exam 1", weight:25, raw:"79" },
+        { id:uid(), name:"Exam 2", weight:25, raw:"" },
+        { id:uid(), name:"Final Project", weight:20, raw:"" }
+      ]}
+    ]
+  };
+}
+
+/* ---------------- math ---------------- */
+function parseScore(raw){
+  if(raw === null || raw === undefined) return null;
+  var s = String(raw).replace(/%/g,"").trim();
+  if(!s) return null;
+  var slash = s.indexOf("/");
+  if(slash > -1){
+    var a = parseFloat(s.slice(0,slash));
+    var b = parseFloat(s.slice(slash+1));
+    if(isNaN(a) || isNaN(b) || b === 0) return NaN;
+    return a / b * 100;
+  }
+  var v = parseFloat(s);
+  return isNaN(v) ? NaN : v;
+}
+function num(v, dflt){
+  var n = parseFloat(v);
+  return isNaN(n) ? dflt : n;
+}
+function round1(n){ return Math.round(n * 10) / 10; }
+function fmt(n){
+  var r = Math.round(n * 10) / 10;
+  return (Math.abs(r - Math.round(r)) < 0.05) ? String(Math.round(r)) : r.toFixed(1);
+}
+function letterFor(p){
+  if(p >= 93) return "A";
+  if(p >= 90) return "A-";
+  if(p >= 87) return "B+";
+  if(p >= 83) return "B";
+  if(p >= 80) return "B-";
+  if(p >= 77) return "C+";
+  if(p >= 73) return "C";
+  if(p >= 70) return "C-";
+  if(p >= 67) return "D+";
+  if(p >= 63) return "D";
+  if(p >= 60) return "D-";
+  return "F";
+}
+
+function analyze(course){
+  var totalW = 0, gradedW = 0, earned = 0;
+  var i, it, pct;
+  var parts = [];
+  for(i = 0; i < course.items.length; i++){
+    it = course.items[i];
+    var w = Math.max(0, num(it.weight, 0));
+    totalW += w;
+    pct = parseScore(it.raw);
+    var graded = (pct !== null && !isNaN(pct));
+    var e = 0;
+    if(graded){
+      gradedW += w;
+      e = w * Math.max(0, pct) / 100;
+      earned += e;
+    }
+    parts.push({ item:it, weight:w, pct:graded ? pct : null, earned:e, graded:graded });
+  }
+  var remW = Math.max(0, totalW - gradedW);
+  var target = Math.min(100, Math.max(1, num(course.target, 90)));
+  var res = {
+    parts: parts,
+    totalW: totalW,
+    gradedW: gradedW,
+    remW: remW,
+    earned: earned,
+    target: target,
+    current: gradedW > 0 ? (earned / gradedW * 100) : null,
+    floor: totalW > 0 ? (earned / totalW * 100) : null,
+    ceil: totalW > 0 ? ((earned + remW) / totalW * 100) : null
+  };
+  res.needed = null;
+  if(totalW > 0 && remW > 0){
+    res.needed = (target / 100 * totalW - earned) / remW * 100;
+  }
+  return res;
+}
+function neededFor(a, t){
+  if(a.totalW <= 0 || a.remW <= 0) return null;
+  return (t / 100 * a.totalW - a.earned) / a.remW * 100;
+}
+function project(a, avg){
+  if(a.totalW <= 0) return null;
+  return (a.earned + a.remW * avg / 100) / a.totalW * 100;
+}
+
+/* ---------------- helpers ---------------- */
+function el(id){ return document.getElementById(id); }
+function clear(node){ while(node.firstChild){ node.removeChild(node.firstChild); } }
+function active(){
+  var i;
+  for(i = 0; i < state.courses.length; i++){
+    if(state.courses[i].id === state.active) return state.courses[i];
+  }
+  state.active = state.courses[0].id;
+  return state.courses[0];
+}
+
+/* ---------------- render: courses ---------------- */
+function renderCourses(){
+  var box = el("courses");
+  clear(box);
+  var i;
+  for(i = 0; i < state.courses.length; i++){
+    (function(c){
+      var a = analyze(c);
+      var b = document.createElement("button");
+      b.className = "chip" + (c.id === state.active ? " on" : "");
+      b.type = "button";
+      var t = document.createElement("span");
+      t.textContent = c.name || "Untitled course";
+      b.appendChild(t);
+      var p = document.createElement("span");
+      p.className = "chip-pct";
+      p.textContent = a.current === null ? "--" : fmt(a.current) + "%";
+      b.appendChild(p);
+      b.onclick = function(){
+        state.active = c.id;
+        confirmDel = 0;
+        save();
+        renderAll();
+      };
+      box.appendChild(b);
+    })(state.courses[i]);
+  }
+  var add = document.createElement("button");
+  add.className = "chip chip-add";
+  add.type = "button";
+  add.textContent = "+ Course";
+  add.onclick = addCourse;
+  box.appendChild(add);
+}
+
+function addCourse(){
+  var c = { id:uid(), name:"New course", target:90, items:[
+    { id:uid(), name:"Assignments", weight:40, raw:"" },
+    { id:uid(), name:"Midterm", weight:25, raw:"" },
+    { id:uid(), name:"Final Exam", weight:35, raw:"" }
+  ]};
+  state.courses.push(c);
+  state.active = c.id;
+  confirmDel = 0;
+  save();
+  renderAll();
+  var n = el("cname");
+  if(n){ n.focus(); n.select(); }
+}
+
+/* ---------------- render: head + hero + rail ---------------- */
+function renderHead(a, c){
+  el("cname").value = c.name;
+  el("target").value = c.target;
+
+  var hp = el("hero-pct"), hl = el("hero-letter"), hs = el("hero-sub");
+  if(a.current === null){
+    hp.textContent = "--";
+    hl.textContent = "";
+    hs.textContent = a.totalW > 0
+      ? "No graded work yet. Enter a score and the whole course lights up."
+      : "Add a component with a weight to get started.";
+  }else{
+    hp.textContent = fmt(a.current) + "%";
+    hl.textContent = letterFor(a.current);
+    clear(hs);
+    hs.appendChild(document.createTextNode("Figured on the "));
+    var b1 = document.createElement("b");
+    b1.textContent = fmt(a.gradedW / a.totalW * 100) + "%";
+    hs.appendChild(b1);
+    hs.appendChild(document.createTextNode(" of the course already graded. If every remaining point were lost you would land at "));
+    var b2 = document.createElement("b");
+    b2.textContent = fmt(a.floor) + "%";
+    hs.appendChild(b2);
+    hs.appendChild(document.createTextNode("; a clean sweep tops out at "));
+    var b3 = document.createElement("b");
+    b3.textContent = fmt(a.ceil) + "%";
+    hs.appendChild(b3);
+    hs.appendChild(document.createTextNode("."));
+  }
+}
+
+function renderRail(a){
+  var track = el("rail-track");
+  var labs = el("rail-labels");
+  clear(track);
+  clear(labs);
+  if(a.totalW <= 0){ return; }
+
+  var i, p, segW;
+  for(i = 0; i < a.parts.length; i++){
+    p = a.parts[i];
+    segW = p.weight / a.totalW * 100;
+    var seg = document.createElement("div");
+    seg.className = "seg";
+    seg.style.width = segW + "%";
+    if(p.graded){
+      var share = Math.max(0, Math.min(100, p.pct));
+      var e = document.createElement("div");
+      e.className = "fill-earn";
+      e.style.width = share + "%";
+      seg.appendChild(e);
+      var l = document.createElement("div");
+      l.className = "fill-lost";
+      l.style.width = (100 - share) + "%";
+      seg.appendChild(l);
+      seg.title = p.item.name + ": " + fmt(p.pct) + "% of " + fmt(p.weight) + " points";
+    }else{
+      var pd = document.createElement("div");
+      pd.className = "fill-pend";
+      pd.style.width = "100%";
+      seg.appendChild(pd);
+      seg.title = p.item.name + ": " + fmt(p.weight) + " points still open";
+    }
+    track.appendChild(seg);
+
+    var lab = document.createElement("div");
+    lab.className = "rlab";
+    lab.style.width = segW + "%";
+    lab.textContent = segW >= 7 ? p.item.name : "";
+    labs.appendChild(lab);
+  }
+
+  var mark = document.createElement("div");
+  mark.className = "rail-mark rail-target";
+  mark.style.left = Math.min(99.7, a.target) + "%";
+  mark.setAttribute("data-lab", fmt(a.target));
+  track.parentNode.appendChild(mark);
+}
+
+/* ---------------- render: need ---------------- */
+function renderNeed(a){
+  var line = el("need-line"), big = el("need-big"), note = el("need-note");
+  big.className = "need-big";
+
+  if(a.totalW <= 0){
+    line.textContent = "Nothing to figure yet";
+    big.textContent = "--";
+    note.textContent = "Add at least one weighted component.";
+  }else if(a.remW <= 0){
+    line.textContent = "Every point is in";
+    big.textContent = fmt(a.floor) + "%";
+    big.className = "need-big " + (a.floor >= a.target ? "ok" : "bad");
+    note.textContent = a.floor >= a.target
+      ? "You finished at or above your target. Final letter: " + letterFor(a.floor) + "."
+      : "Final letter: " + letterFor(a.floor) + ". Nothing left to move it.";
+  }else if(a.needed <= 0){
+    line.textContent = "Your target is already locked in";
+    big.textContent = "0%";
+    big.className = "need-big ok";
+    note.textContent = "Even a zero on the remaining " + fmt(a.remW / a.totalW * 100) +
+      "% of the course leaves you at " + fmt(a.floor) + "%.";
+  }else if(a.needed > 100){
+    line.textContent = "Your target is out of reach";
+    big.textContent = fmt(a.needed) + "%";
+    big.className = "need-big bad";
+    note.textContent = "A perfect run on everything left tops out at " + fmt(a.ceil) +
+      "% (" + letterFor(a.ceil) + "). Lower the target or ask about extra credit.";
+  }else{
+    line.textContent = "To finish at " + fmt(a.target) + "% you need an average of";
+    big.textContent = fmt(a.needed) + "%";
+    big.className = "need-big " + (a.needed > 93 ? "warn" : "ok");
+    note.textContent = "on the remaining " + fmt(a.remW / a.totalW * 100) +
+      "% of the course, worth " + fmt(a.remW) + " points.";
+  }
+
+  /* ladder */
+  var lad = el("ladder");
+  clear(lad);
+  var i;
+  for(i = 0; i < LADDER.length; i++){
+    (function(row){
+      var t = row[0], name = row[1];
+      var n = neededFor(a, t);
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "rung" + (Math.abs(a.target - t) < 0.01 ? " on" : "");
+      var lv = document.createElement("span");
+      lv.className = "rung-l";
+      lv.textContent = name + " " + t;
+      b.appendChild(lv);
+      var vv = document.createElement("span");
+      vv.className = "rung-v";
+      if(n === null){
+        vv.textContent = a.floor !== null && a.floor >= t ? "earned" : "closed";
+        vv.className = "rung-v " + (a.floor !== null && a.floor >= t ? "ok" : "bad");
+      }else if(n <= 0){
+        vv.textContent = "locked";
+        vv.className = "rung-v ok";
+      }else if(n > 100){
+        vv.textContent = "no path";
+        vv.className = "rung-v bad";
+      }else{
+        vv.textContent = fmt(n) + "% avg";
+        vv.className = "rung-v " + (n > 93 ? "warn" : "ok");
+      }
+      b.appendChild(vv);
+      b.onclick = function(){
+        active().target = t;
+        save();
+        renderDerived();
+      };
+      lad.appendChild(b);
+    })(LADDER[i]);
+  }
+
+  /* per-item requirement */
+  var rem = el("remain");
+  clear(rem);
+  if(a.remW > 0 && a.needed !== null && a.needed > 0 && a.needed <= 100){
+    var h = document.createElement("p");
+    h.className = "eyebrow";
+    h.style.margin = "0 0 6px";
+    h.textContent = "If you hold that average on each";
+    rem.appendChild(h);
+    var j, p;
+    for(j = 0; j < a.parts.length; j++){
+      p = a.parts[j];
+      if(p.graded || p.weight <= 0) continue;
+      var r = document.createElement("div");
+      r.className = "remain-row";
+      var nm = document.createElement("div");
+      nm.className = "remain-name";
+      nm.textContent = p.item.name || "Untitled";
+      var sp = document.createElement("span");
+      sp.textContent = fmt(p.weight) + "% weight";
+      nm.appendChild(sp);
+      r.appendChild(nm);
+      var vv = document.createElement("div");
+      vv.className = "remain-need";
+      vv.textContent = fmt(a.needed) + "%  =  " + fmt(p.weight * a.needed / 100) + " of " + fmt(p.weight) + " pts";
+      r.appendChild(vv);
+      rem.appendChild(r);
+    }
+  }
+}
+
+/* ---------------- render: projection ---------------- */
+function renderProj(a){
+  var slider = el("proj");
+  var v = num(slider.value, 90);
+  el("proj-in").textContent = v + "%";
+  var out = el("proj-out");
+  if(a.totalW <= 0){
+    out.textContent = "--";
+    return;
+  }
+  var f = project(a, v);
+  out.textContent = fmt(f) + "% " + letterFor(f);
+  out.style.color = f >= a.target ? "var(--mint)" : "var(--chalk)";
+}
+
+/* ---------------- render: rows ---------------- */
+function renderRows(){
+  var c = active();
+  var box = el("rows");
+  clear(box);
+  if(!c.items.length){
+    var e = document.createElement("p");
+    e.className = "empty";
+    e.textContent = "No components yet. Add the first line of your syllabus grading table.";
+    box.appendChild(e);
+    return;
+  }
+  var i;
+  for(i = 0; i < c.items.length; i++){
+    (function(it){
+      var row = document.createElement("div");
+      row.className = "trow";
+
+      var n = document.createElement("input");
+      n.className = "cell";
+      n.type = "text";
+      n.value = it.name;
+      n.maxLength = 40;
+      n.setAttribute("aria-label", "Item name");
+      n.oninput = function(){ it.name = n.value; save(); renderDerived(); };
+      row.appendChild(n);
+
+      var w = document.createElement("input");
+      w.className = "cell cell-w";
+      w.type = "text";
+      w.inputMode = "decimal";
+      w.value = it.weight;
+      w.setAttribute("aria-label", "Weight percent");
+      w.oninput = function(){ it.weight = w.value; save(); renderDerived(); };
+      row.appendChild(w);
+
+      var s = document.createElement("input");
+      s.className = "cell cell-s";
+      s.type = "text";
+      s.inputMode = "decimal";
+      s.value = it.raw;
+      s.placeholder = "--";
+      s.setAttribute("aria-label", "Score");
+      s.oninput = function(){
+        it.raw = s.value;
+        var p = parseScore(s.value);
+        s.className = "cell cell-s" + (p === null ? "" : (isNaN(p) ? " bad" : " has"));
+        save();
+        renderDerived();
+      };
+      var p0 = parseScore(it.raw);
+      s.className = "cell cell-s" + (p0 === null ? "" : (isNaN(p0) ? " bad" : " has"));
+      row.appendChild(s);
+
+      var k = document.createElement("button");
+      k.className = "kill";
+      k.type = "button";
+      k.innerHTML = "&times;";
+      k.title = "Remove " + (it.name || "item");
+      k.setAttribute("aria-label", "Remove " + (it.name || "item"));
+      k.onclick = function(){
+        var idx = c.items.indexOf(it);
+        if(idx > -1) c.items.splice(idx, 1);
+        save();
+        renderRows();
+        renderDerived();
+      };
+      row.appendChild(k);
+
+      box.appendChild(row);
+    })(c.items[i]);
+  }
+}
+
+/* ---------------- render: weight sum ---------------- */
+function renderWsum(a){
+  var s = el("wsum");
+  s.textContent = "Weights total " + fmt(a.totalW) + "%";
+  s.className = "wsum" + (Math.abs(a.totalW - 100) > 0.05 ? " off" : "");
+
+  var fix = el("wfix");
+  clear(fix);
+  if(Math.abs(a.totalW - 100) > 0.05 && a.totalW > 0){
+    var d = document.createElement("div");
+    d.className = "wfix";
+    var t = document.createElement("span");
+    t.textContent = "These weights add to " + fmt(a.totalW) + "%, so grades are figured against that total.";
+    d.appendChild(t);
+    var b = document.createElement("button");
+    b.type = "button";
+    b.textContent = "Scale to 100%";
+    b.onclick = function(){
+      var c = active(), i, k = 100 / a.totalW;
+      for(i = 0; i < c.items.length; i++){
+        c.items[i].weight = round1(Math.max(0, num(c.items[i].weight, 0)) * k);
+      }
+      save();
+      renderRows();
+      renderDerived();
+    };
+    d.appendChild(b);
+    fix.appendChild(d);
+  }
+}
+
+/* ---------------- render: chart ---------------- */
+function drawChart(a){
+  var cv = el("chart");
+  if(!cv) return;
+  var ctx = cv.getContext("2d");
+  if(!ctx) return;
+
+  var parts = a.parts;
+  var host = cv.parentNode;
+  var cssW = host && host.clientWidth ? host.clientWidth : 320;
+  if(cssW < 200) cssW = 200;
+  var rowH = 36, padT = 6, padB = 24;
+  var rows = Math.max(parts.length, 1);
+  var cssH = padT + padB + rows * rowH;
+
+  var dpr = window.devicePixelRatio || 1;
+  cv.width = Math.round(cssW * dpr);
+  cv.height = Math.round(cssH * dpr);
+  cv.style.width = cssW + "px";
+  cv.style.height = cssH + "px";
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, cssW, cssH);
+
+  if(!parts.length || a.totalW <= 0){
+    ctx.fillStyle = "#9AA1C8";
+    ctx.font = "13px 'Archivo',sans-serif";
+    ctx.textBaseline = "middle";
+    ctx.fillText("Add components to see the chart.", 4, cssH / 2);
+    return;
+  }
+
+  var gutL = Math.min(118, Math.max(74, Math.round(cssW * 0.30)));
+  var gutR = 58;
+  var barW = cssW - gutL - gutR;
+  if(barW < 40) barW = 40;
+
+  var maxW = 0, i;
+  for(i = 0; i < parts.length; i++){ if(parts[i].weight > maxW) maxW = parts[i].weight; }
+  if(maxW <= 0) maxW = 1;
+
+  ctx.textBaseline = "middle";
+
+  for(i = 0; i < parts.length; i++){
+    var p = parts[i];
+    var y = padT + i * rowH;
+    var bh = 18;
+    var by = y + (rowH - bh) / 2;
+    var full = p.weight / maxW * barW;
+
+    /* name */
+    ctx.fillStyle = "#ECEAF4";
+    ctx.font = "500 12px 'Archivo',sans-serif";
+    ctx.textAlign = "left";
+    ctx.fillText(fitText(ctx, p.item.name || "Untitled", gutL - 10), 0, y + rowH / 2);
+
+    /* track */
+    ctx.fillStyle = "#262B4D";
+    ctx.fillRect(gutL, by, barW, bh);
+
+    if(p.graded){
+      var share = Math.max(0, Math.min(1, p.pct / 100));
+      var ew = full * share;
+      ctx.fillStyle = "#5FD3AC";
+      ctx.fillRect(gutL, by, ew, bh);
+      if(full - ew > 0.5){
+        hatch(ctx, gutL + ew, by, full - ew, bh, "rgba(231,111,140,.5)", "rgba(231,111,140,.16)");
+      }
+    }else{
+      hatch(ctx, gutL, by, full, bh, "rgba(122,133,201,.42)", "rgba(122,133,201,.13)");
+    }
+
+    /* weight edge tick */
+    ctx.fillStyle = "#363C63";
+    ctx.fillRect(gutL + full - 1, by - 2, 1, bh + 4);
+
+    /* value */
+    ctx.font = "700 12px 'JetBrains Mono',monospace";
+    ctx.textAlign = "right";
+    if(p.graded){
+      ctx.fillStyle = "#5FD3AC";
+      ctx.fillText(fmt(p.earned) + "/" + fmt(p.weight), cssW, y + rowH / 2);
+    }else{
+      ctx.fillStyle = "#9AA1C8";
+      ctx.fillText("-- /" + fmt(p.weight), cssW, y + rowH / 2);
+    }
+  }
+
+  /* baseline */
+  ctx.fillStyle = "#363C63";
+  ctx.fillRect(gutL, padT + parts.length * rowH + 3, barW, 1);
+  ctx.font = "11px 'JetBrains Mono',monospace";
+  ctx.textAlign = "left";
+  ctx.fillStyle = "#9AA1C8";
+  ctx.fillText("points of the final grade", gutL, padT + parts.length * rowH + 15);
+}
+
+function hatch(ctx, x, y, w, h, c1, c2){
+  if(w <= 0) return;
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(x, y, w, h);
+  ctx.clip();
+  ctx.fillStyle = c2;
+  ctx.fillRect(x, y, w, h);
+  ctx.strokeStyle = c1;
+  ctx.lineWidth = 3;
+  var step = 9, k;
+  for(k = -h; k < w + h; k += step){
+    ctx.beginPath();
+    ctx.moveTo(x + k, y + h);
+    ctx.lineTo(x + k + h, y);
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
+function fitText(ctx, txt, max){
+  if(ctx.measureText(txt).width <= max) return txt;
+  var t = txt;
+  while(t.length > 1 && ctx.measureText(t + "\u2026").width > max){
+    t = t.slice(0, -1);
+  }
+  return t + "\u2026";
+}
+
+/* ---------------- render: overview ---------------- */
+function renderOverview(){
+  var card = el("ov-card");
+  var box = el("overview");
+  clear(box);
+  if(state.courses.length < 2){
+    card.style.display = "none";
+    return;
+  }
+  card.style.display = "";
+  var i;
+  for(i = 0; i < state.courses.length; i++){
+    (function(c){
+      var a = analyze(c);
+      var row = document.createElement("button");
+      row.type = "button";
+      row.className = "ovrow";
+
+      var n = document.createElement("div");
+      n.className = "ovname";
+      n.textContent = c.name || "Untitled course";
+      row.appendChild(n);
+
+      var p = document.createElement("div");
+      p.className = "ovpct";
+      if(a.current === null){
+        p.textContent = "--";
+        p.style.color = "var(--muted)";
+      }else{
+        p.textContent = fmt(a.current) + "% " + letterFor(a.current);
+        p.style.color = a.current >= a.target ? "var(--mint)" : "var(--chalk)";
+      }
+      row.appendChild(p);
+
+      var bar = document.createElement("div");
+      bar.className = "ovbar";
+      if(a.totalW > 0){
+        var e = document.createElement("div");
+        e.className = "fill-earn";
+        e.style.width = (a.earned / a.totalW * 100) + "%";
+        bar.appendChild(e);
+        var lost = a.gradedW - a.earned;
+        var l = document.createElement("div");
+        l.className = "fill-lost";
+        l.style.width = (lost / a.totalW * 100) + "%";
+        bar.appendChild(l);
+        var pd = document.createElement("div");
+        pd.className = "fill-pend";
+        pd.style.width = (a.remW / a.totalW * 100) + "%";
+        bar.appendChild(pd);
+      }
+      row.appendChild(bar);
+
+      var need = document.createElement("div");
+      need.className = "ovneed";
+      if(a.totalW <= 0){
+        need.textContent = "no components yet";
+      }else if(a.remW <= 0){
+        need.textContent = "final: " + fmt(a.floor) + "% - all work graded";
+      }else if(a.needed <= 0){
+        need.textContent = "target " + fmt(a.target) + "% locked in";
+      }else if(a.needed > 100){
+        need.textContent = "target " + fmt(a.target) + "% out of reach - ceiling " + fmt(a.ceil) + "%";
+      }else{
+        need.textContent = "needs " + fmt(a.needed) + "% avg on the last " + fmt(a.remW) + " pts";
+      }
+      row.appendChild(need);
+
+      row.onclick = function(){
+        state.active = c.id;
+        confirmDel = 0;
+        save();
+        renderAll();
+        window.scrollTo({ top:0, behavior:"smooth" });
+      };
+      box.appendChild(row);
+    })(state.courses[i]);
+  }
+}
+
+/* ---------------- render orchestration ---------------- */
+function renderDerived(){
+  var c = active();
+  var a = analyze(c);
+  renderHead(a, c);
+  renderRail(a);
+  renderNeed(a);
+  renderProj(a);
+  renderWsum(a);
+  drawChart(a);
+  renderCourses();
+  renderOverview();
+}
+function renderAll(){
+  renderRows();
+  renderDerived();
+}
+
+/* ---------------- wiring ---------------- */
+function init(){
+  state = load() || seed();
+  var i, j;
+  for(i = 0; i < state.courses.length; i++){
+    if(!state.courses[i].items) state.courses[i].items = [];
+    for(j = 0; j < state.courses[i].items.length; j++){
+      if(!state.courses[i].items[j].id) state.courses[i].items[j].id = uid();
+    }
+  }
+
+  el("cname").oninput = function(){
+    active().name = this.value;
+    save();
+    renderCourses();
+    renderOverview();
+  };
+  el("target").oninput = function(){
+    active().target = num(this.value, 90);
+    save();
+    renderDerived();
+  };
+  el("add-item").onclick = function(){
+    var c = active();
+    c.items.push({ id:uid(), name:"New item", weight:10, raw:"" });
+    save();
+    renderRows();
+    renderDerived();
+    var rows = el("rows").getElementsByClassName("cell");
+    if(rows.length){
+      var last = rows[rows.length - 3];
+      if(last){ last.focus(); last.select(); }
+    }
+  };
+  el("proj").oninput = function(){ renderProj(analyze(active())); };
+
+  el("del-course").onclick = function(){
+    var b = this;
+    if(state.courses.length < 2){
+      b.textContent = "Keep at least one course";
+      window.setTimeout(function(){ b.textContent = "Delete this course"; }, 2200);
+      return;
+    }
+    if(confirmDel !== 1){
+      confirmDel = 1;
+      b.textContent = "Tap again to delete";
+      window.setTimeout(function(){
+        if(confirmDel === 1){ confirmDel = 0; b.textContent = "Delete this course"; }
+      }, 3500);
+      return;
+    }
+    confirmDel = 0;
+    b.textContent = "Delete this course";
+    var idx = state.courses.indexOf(active());
+    if(idx > -1) state.courses.splice(idx, 1);
+    state.active = state.courses[0].id;
+    save();
+    renderAll();
+  };
+
+  el("reset").onclick = function(){
+    var b = this;
+    if(confirmReset !== 1){
+      confirmReset = 1;
+      b.textContent = "Tap again to erase everything";
+      window.setTimeout(function(){
+        if(confirmReset === 1){ confirmReset = 0; b.textContent = "Start fresh"; }
+      }, 3500);
+      return;
+    }
+    confirmReset = 0;
+    b.textContent = "Start fresh";
+    state = { active:"c1", courses:[ { id:"c1", name:"New course", target:90, items:[
+      { id:uid(), name:"Assignments", weight:40, raw:"" },
+      { id:uid(), name:"Midterm", weight:25, raw:"" },
+      { id:uid(), name:"Final Exam", weight:35, raw:"" }
+    ]}]};
+    save();
+    renderAll();
+  };
+
+  var t = null;
+  window.addEventListener("resize", function(){
+    if(t) window.clearTimeout(t);
+    t = window.setTimeout(function(){ drawChart(analyze(active())); }, 140);
+  });
+
+  renderAll();
+
+  if(document.fonts && document.fonts.ready && document.fonts.ready.then){
+    document.fonts.ready.then(function(){ drawChart(analyze(active())); });
+  }
+}
+
+if(document.readyState === "loading"){
+  document.addEventListener("DOMContentLoaded", init);
+}else{
+  init();
+}
+
+})();
+</script>
+</body>
+</html>
