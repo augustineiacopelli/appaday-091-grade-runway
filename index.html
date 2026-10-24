@@ -10,6 +10,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <link rel="manifest" href="https://augustineiacopelli.github.io/appaday/manifests/091.webmanifest">
 <script src="https://augustineiacopelli.github.io/appaday/save.js" defer></script>
+<script src="https://augustineiacopelli.github.io/appaday/keys.js" data-app="091" data-legacy-key="appaday091-key" data-accent="#B8860B" defer></script>
 <title>Grade Runway | AppADay 091</title>
 <meta name="description" content="Track weighted course grades across every class and see the minimum average you still need on the work that is left.">
 <meta name="theme-color" content="#171A2B">
@@ -436,14 +437,11 @@ canvas{display:block;max-width:100%}
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="set-title">
     <h2 id="set-title">Settings</h2>
     <p>Reading a syllabus calls the Anthropic API from this page with your own key. Everything else in Grade Runway works without one.</p>
-    <label for="key">Anthropic API key</label>
-    <input id="key" type="password" autocomplete="off" spellcheck="false" placeholder="sk-ant-...">
-    <p style="margin:8px 0 0;font-size:12px">Stored in this browser only. Never sent anywhere but api.anthropic.com.</p>
+    <div id="keyMount"><p style="margin:8px 0 0;font-size:12px">The key manager is loading. If this stays, check your connection and reload.</p></div>
     <div id="testresult"></div>
     <div class="modal-acts">
       <button class="btn" id="set-test" type="button">Test key</button>
-      <button class="btn" id="set-cancel" type="button">Cancel</button>
-      <button class="btn btn-go" id="set-save" type="button">Save</button>
+      <button class="btn btn-go" id="set-cancel" type="button">Close</button>
     </div>
   </div>
 </div>
@@ -458,7 +456,6 @@ canvas{display:block;max-width:100%}
 "use strict";
 
 var KEY = "appaday-091-grade-runway";
-var K_KEY = "appaday091-key";
 var API_URL = "https://api.anthropic.com/v1/messages";
 var CLAUDE_MODEL = "claude-sonnet-5";
 var MAX_FILE_BYTES = 25 * 1024 * 1024;
@@ -1240,21 +1237,17 @@ function renderAll(){
 }
 
 /* ---------------- settings ---------------- */
-function getKey(){
-  try{ return (localStorage.getItem(K_KEY) || "").trim(); }catch(e){ return ""; }
-}
-function setKey(v){
-  try{ localStorage.setItem(K_KEY, v); }catch(e){}
-}
+function hasKey(){ return !!(window.AppKeys && window.AppKeys.has()); }
 function markGear(){
   var g = el("gear");
-  g.className = getKey() ? "gear" : "gear dot";
+  g.className = hasKey() ? "gear" : "gear dot";
 }
+window.addEventListener("appaday:keychange", markGear);
+document.addEventListener("DOMContentLoaded", markGear);
 function openSettings(){
-  el("key").value = getKey();
+  if(window.AppKeys) window.AppKeys.mountSettings(el("keyMount"));
   clear(el("testresult"));
   el("overlay").hidden = false;
-  window.setTimeout(function(){ el("key").focus(); }, 40);
 }
 function closeSettings(){ el("overlay").hidden = true; }
 
@@ -1294,11 +1287,15 @@ function readText(file){
   });
 }
 
-function acceptFile(file){
+async function acceptFile(file){
   if(!file) return;
-  if(!getKey()){
-    note("Add your Anthropic API key in Settings first.", "bad");
-    openSettings();
+  if(!window.AppKeys){
+    note("The key manager did not load. Check your connection and reload.", "bad");
+    return;
+  }
+  var apiKey = await window.AppKeys.get();
+  if(!apiKey){
+    note("Add your Claude API key with the gear button, then drop the file again.", "bad");
     return;
   }
   if(file.size > MAX_FILE_BYTES){
@@ -1311,19 +1308,19 @@ function acceptFile(file){
 
   if(isPdf){
     readB64(file).then(function(b64){
-      askClaude([{ type:"document", source:{ type:"base64", media_type:"application/pdf", data:b64 } }], file.name);
+      askClaude([{ type:"document", source:{ type:"base64", media_type:"application/pdf", data:b64 } }], file.name, apiKey);
     })["catch"](function(e){ note(e.message, "bad"); });
     return;
   }
   if(TEXT_EXTS[ext] || /^text\//.test(file.type || "")){
     readText(file).then(function(t){
-      askClaude([{ type:"text", text:"Syllabus text follows.\n\n" + t.slice(0, 60000) }], file.name);
+      askClaude([{ type:"text", text:"Syllabus text follows.\n\n" + t.slice(0, 60000) }], file.name, apiKey);
     })["catch"](function(e){ note(e.message, "bad"); });
     return;
   }
   if(img){
     readB64(file).then(function(b64){
-      askClaude([{ type:"image", source:{ type:"base64", media_type:img, data:b64 } }], file.name);
+      askClaude([{ type:"image", source:{ type:"base64", media_type:img, data:b64 } }], file.name, apiKey);
     })["catch"](function(e){ note(e.message, "bad"); });
     return;
   }
@@ -1349,7 +1346,7 @@ function promptText(){
     '{"error":"one short sentence saying what you saw instead"}';
 }
 
-function askClaude(blocks, label){
+function askClaude(blocks, label, apiKey){
   note("Reading " + label + " with Claude. This usually takes a few seconds.", "");
   var drop = el("drop");
   drop.style.opacity = ".5";
@@ -1362,7 +1359,7 @@ function askClaude(blocks, label){
     method:"POST",
     headers:{
       "Content-Type":"application/json",
-      "x-api-key":getKey(),
+      "x-api-key":apiKey,
       "anthropic-version":"2023-06-01",
       "anthropic-dangerous-direct-browser-access":"true"
     },
@@ -1591,23 +1588,19 @@ function init(){
   markGear();
   el("gear").onclick = openSettings;
   el("set-cancel").onclick = closeSettings;
-  el("set-save").onclick = function(){
-    setKey(el("key").value.trim());
-    markGear();
-    closeSettings();
-  };
   el("overlay").onclick = function(e){ if(e.target === this) closeSettings(); };
   document.addEventListener("keydown", function(e){
     if(e.key === "Escape" && !el("overlay").hidden) closeSettings();
   });
 
-  el("set-test").onclick = function(){
-    var btn = this, k = el("key").value.trim(), out = el("testresult");
+  el("set-test").onclick = async function(){
+    var btn = this, out = el("testresult");
     clear(out);
+    var k = hasKey() ? await window.AppKeys.get() : "";
     if(!k){
       var w = document.createElement("div");
       w.className = "imp-note bad";
-      w.textContent = "Paste a key first.";
+      w.textContent = "Add a key above first.";
       out.appendChild(w);
       return;
     }
@@ -1653,9 +1646,9 @@ function init(){
   };
 
   el("drop").onclick = function(){
-    if(!getKey()){
-      note("Reading a syllabus needs an Anthropic API key. Add one here, then drop the file again.", "");
-      openSettings();
+    if(!hasKey()){
+      note("Reading a syllabus needs a Claude API key. Add one here, then tap the drop zone again.", "");
+      if(window.AppKeys) window.AppKeys.get();
       return;
     }
     el("file").click();
