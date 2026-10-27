@@ -10,6 +10,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <link rel="manifest" href="https://augustineiacopelli.github.io/appaday/manifests/091.webmanifest">
 <script src="https://augustineiacopelli.github.io/appaday/save.js" defer></script>
+<script src="https://augustineiacopelli.github.io/appaday/models.js"></script>
 <script src="https://augustineiacopelli.github.io/appaday/keys.js" data-app="091" data-legacy-key="appaday091-key" data-accent="#B8860B" defer></script>
 <title>Grade Runway | AppADay 091</title>
 <meta name="description" content="Track weighted course grades across every class and see the minimum average you still need on the work that is left.">
@@ -457,7 +458,7 @@ canvas{display:block;max-width:100%}
 
 var KEY = "appaday-091-grade-runway";
 var API_URL = "https://api.anthropic.com/v1/messages";
-var CLAUDE_MODEL = "claude-sonnet-5";
+var CLAUDE_MODEL = (window.AppModels ? window.AppModels.id("sonnet") : "");
 var MAX_FILE_BYTES = 25 * 1024 * 1024;
 var IMAGE_TYPES = { png:"image/png", jpg:"image/jpeg", jpeg:"image/jpeg", webp:"image/webp", gif:"image/gif" };
 var TEXT_EXTS = { txt:1, md:1, markdown:1, text:1, rtf:1, csv:1 };
@@ -1693,15 +1694,6 @@ if(document.readyState === "loading"){
 
 })();
 
-async function getModel(tier = 'sonnet') {
-  try {
-    const response = await fetch('../config.json');
-    const config = await response.json();
-    return config.models[tier];
-  } catch {
-    return 'claude-sonnet-5-5';
-  }
-}
 </script>
 </body>
 </html>

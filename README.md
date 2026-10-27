@@ -43,7 +43,7 @@ Course data is kept in `localStorage` on the device. There is no account and no 
 
 One self-contained file. Vanilla HTML, CSS, and JavaScript, no framework and no build step. The rail and the course bars are laid out in CSS so they reflow at any width; the contribution chart is drawn on a canvas with device-pixel-ratio scaling and redrawn on resize and after web fonts settle. Component rows are rebuilt only on structural changes so typing never loses focus, while every derived readout recomputes on each keystroke.
 
-Syllabus PDFs are base64 encoded in the browser and passed to the Messages API as a `document` block, so there is no PDF parsing library and no server in the path. The model is pinned to `claude-sonnet-5`. Responses are requested as bare JSON, fences are stripped defensively, parsing is wrapped, and every returned weight is checked for a finite positive number before it is allowed anywhere near your grades.
+Syllabus PDFs are base64 encoded in the browser and passed to the Messages API as a `document` block, so there is no PDF parsing library and no server in the path. The model is the current Claude Sonnet model, set by the portal's models.js. Responses are requested as bare JSON, fences are stripped defensively, parsing is wrapped, and every returned weight is checked for a finite positive number before it is allowed anywhere near your grades.
 
 Type is Bricolage Grotesque for display, Archivo for interface, and JetBrains Mono for every figure, on an indigo ground with a graph-paper grid.
 
