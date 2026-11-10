@@ -1366,7 +1366,7 @@ function askClaude(blocks, label, apiKey){
     },
     body:JSON.stringify({
       model:CLAUDE_MODEL,
-      max_tokens:2000,
+      max_tokens:2000, thinking: (window.AppModels && window.AppModels.thinking ? window.AppModels.thinking(CLAUDE_MODEL) : undefined),
       messages:[{ role:"user", content:content }]
     })
   }).then(function(r){
@@ -1619,7 +1619,7 @@ function init(){
         "anthropic-version":"2023-06-01",
         "anthropic-dangerous-direct-browser-access":"true"
       },
-      body:JSON.stringify({ model:CLAUDE_MODEL, max_tokens:16, messages:[{ role:"user", content:"Reply with the single word ready." }] })
+      body:JSON.stringify({ model:CLAUDE_MODEL, max_tokens:16, thinking: (window.AppModels && window.AppModels.thinking ? window.AppModels.thinking(CLAUDE_MODEL) : undefined), messages:[{ role:"user", content:"Reply with the single word ready." }] })
     }).then(function(r){
       return r.json().then(function(j){ return { ok:r.ok, body:j }; });
     }).then(function(res){
